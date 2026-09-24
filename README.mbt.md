@@ -55,6 +55,8 @@ CLI 输出到标准输出，不自动覆盖原文件。`check` 和 `plan` 输出
 
 `generated_pregap_frames` / `generated_postgap_frames` 是后续消费者可选择执行的静音插入指令，不会被加到源文件偏移中。
 
+如需检查是否遗漏音频，使用 `audit` 命令（参数同 `plan`），或 `audit_plan(text, policy, durations)`。报告列出每个 FILE 声明的已选帧数、已知排除区间及总帧数。没有音源长度时 `complete` 为 false，选中总帧数保持 `null`；有长度时可核对“选中帧数 + 排除帧数 = 总帧数”。合成静音不计入源音频覆盖量，`complete` 不表示已经读取媒体验证。
+
 ## MoonBit API
 
 播放器集成可使用 `catalog(text)`，或运行 `node cli/mooncue.mjs catalog examples/album.cue`。输出按曲目排列的文件引用、INDEX 01 位置、标题及表演者/词曲作者。轨级元数据优先于专辑级；未指定的表演者和词曲作者为空字符串，缺少标题时使用 `Track NN`。返回结果是导航数据，不包含播放功能。

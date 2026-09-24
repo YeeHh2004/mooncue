@@ -9,6 +9,7 @@ Usage:
   node cli/mooncue.mjs normalize <file.cue>
   node cli/mooncue.mjs catalog <file.cue>
   node cli/mooncue.mjs plan <file.cue> [--gap exclude|append|prepend] [--durations file.json]
+  node cli/mooncue.mjs audit <file.cue> [--gap exclude|append|prepend] [--durations file.json]
 
 All file input must be UTF-8. Output goes to stdout; input is never overwritten.
 Durations: JSON object mapping exact FILE names to integer lengths in CD frames (1/75 s).
@@ -21,7 +22,7 @@ if (!args.length || args[0] === '--help') {
 } else {
   try {
     const [command, input, ...options] = args;
-    if (!['check', 'normalize', 'plan', 'catalog'].includes(command) || !input || input.startsWith('--')) {
+    if (!['check', 'normalize', 'plan', 'catalog', 'audit'].includes(command) || !input || input.startsWith('--')) {
       throw new Error('Expected a command and input file. Run with --help.');
     }
     let gap = 'exclude';
@@ -30,7 +31,7 @@ if (!args.length || args[0] === '--help') {
     for (let i = 0; i < options.length; i += 2) {
       const key = options[i];
       const value = options[i + 1];
-      if (command !== 'plan' || !['--gap', '--durations'].includes(key) || !value || seen.has(key)) {
+      if (!['plan','audit'].includes(command) || !['--gap', '--durations'].includes(key) || !value || seen.has(key)) {
         throw new Error(`Invalid or duplicate option: ${key}`);
       }
       seen.add(key);

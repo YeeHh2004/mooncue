@@ -65,6 +65,15 @@ test('unknown end stays null in JSON', () => {
   assert.equal(r.status,0);
   assert.equal(JSON.parse(r.stdout).output[1].end_frame,null);
 });
+test('audit reports omitted audio and explicit incomplete coverage', () => {
+  const known = JSON.parse(cli('audit','examples/album.cue','--durations','examples/durations.json').stdout);
+  assert.equal(known.output.complete,true);
+  assert.equal(known.output.sources[0].selected_frames,29850);
+  assert.equal(known.output.sources[0].known_omitted_frames,150);
+  const unknown = JSON.parse(cli('audit','examples/album.cue').stdout);
+  assert.equal(unknown.output.complete,false);
+  assert.equal(unknown.output.sources[0].selected_frames,null);
+});
 test('multifile fixture retains file-local ranges and generated silence', () => {
   const r = cli('plan','examples/multifile.cue');
   assert.equal(r.status,0);

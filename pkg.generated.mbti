@@ -6,6 +6,8 @@ import {
 }
 
 // Values
+pub fn audit_plan(String, GapPolicy, Map[String, Int]) -> Result[PlanAudit, Array[Diagnostic]]
+
 pub fn catalog(String) -> Result[Array[TrackEntry], Array[Diagnostic]]
 
 pub fn format_time(Int) -> Result[String, String]
@@ -50,6 +52,17 @@ pub(all) enum GapPolicy {
   PrependNext
 } derive(Eq)
 
+pub struct OmittedRange {
+  start_frame : Int
+  end_frame : Int
+} derive(Eq, ToJson)
+
+pub struct PlanAudit {
+  complete : Bool
+  segments : Array[Segment]
+  sources : Array[SourceCoverage]
+} derive(ToJson)
+
 pub struct Report {
   sheet : Sheet
   diagnostics : Array[Diagnostic]
@@ -72,6 +85,16 @@ pub struct Sheet {
   remarks : Array[String]
   files : Array[CueFile]
 } derive(ToJson)
+
+pub struct SourceCoverage {
+  file : String
+  source_number : Int
+  total_frames : Int?
+  selected_frames : Int?
+  known_omitted_frames : Int
+  omitted : Array[OmittedRange]
+}
+pub impl ToJson for SourceCoverage
 
 pub struct Track {
   number : Int

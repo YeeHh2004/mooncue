@@ -243,7 +243,7 @@ pub fn process_request(
         )
     }
   }
-  if command == "plan" {
+  if command == "plan" || command == "audit" {
     let policy = match policy_name {
       "exclude" => Exclude
       "append" => AppendPrevious
@@ -264,6 +264,23 @@ pub fn process_request(
             "ok": false,
             "error": "durations must be a JSON object mapping filenames to integer CD-frame lengths",
           } : Json).stringify()
+    }
+    if command == "audit" {
+      return match audit_plan(text, policy, durations) {
+        Ok(audit) =>
+          (
+            {
+              "ok": true,
+              "timebase": "1/75",
+              "gap_policy": policy_name.to_json(),
+              "output": audit.to_json(),
+              "diagnostics": report.diagnostics.to_json(),
+            } : Json).stringify(indent=2)
+        Err(ds) =>
+          ({ "ok": false, "diagnostics": ds.to_json() } : Json).stringify(
+            indent=2,
+          )
+      }
     }
     return match plan(text, policy, durations) {
       Ok(segments) =>
