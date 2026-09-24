@@ -15,6 +15,14 @@ test('CLI help succeeds', () => {
   const r = cli('--help');
   assert.equal(r.status, 0); assert.match(r.stdout, /Usage:/);
 });
+test('catalog exposes player-ready tracks and inherited performers', () => {
+  const r = cli('catalog','examples/album.cue');
+  assert.equal(r.status,0,r.stderr);
+  const data = JSON.parse(r.stdout);
+  assert.equal(data.output[0].performer,'MoonCue Demo');
+  assert.equal(data.output[1].start_frame,18000);
+  assert.equal(cli('catalog','examples/invalid.cue').status,1);
+});
 test('check good fixture reports valid structured data', () => {
   const r = cli('check', 'examples/album.cue');
   assert.equal(r.status, 0, r.stderr);

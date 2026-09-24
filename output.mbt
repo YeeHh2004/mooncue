@@ -204,6 +204,22 @@ pub fn process_request(
   durations_json : String,
 ) -> String {
   let report = parse(text)
+  if command == "catalog" {
+    return match catalog(text) {
+      Ok(entries) =>
+        (
+          {
+            "ok": true,
+            "timebase": "1/75",
+            "output": entries.to_json(),
+            "diagnostics": report.diagnostics.to_json(),
+          } : Json).stringify(indent=2)
+      Err(ds) =>
+        ({ "ok": false, "diagnostics": ds.to_json() } : Json).stringify(
+          indent=2,
+        )
+    }
+  }
   if command == "check" {
     let response : Json = {
       "ok": report.is_valid().to_json(),

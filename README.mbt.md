@@ -57,6 +57,8 @@ CLI 输出到标准输出，不自动覆盖原文件。`check` 和 `plan` 输出
 
 ## MoonBit API
 
+播放器集成可使用 `catalog(text)`，或运行 `node cli/mooncue.mjs catalog examples/album.cue`。输出按曲目排列的文件引用、INDEX 01 位置、标题及表演者/词曲作者。轨级元数据优先于专辑级；未指定的表演者和词曲作者为空字符串，缺少标题时使用 `Track NN`。返回结果是导航数据，不包含播放功能。
+
 本项目尚未发布至 Mooncakes；当前请克隆源码运行，或将模块作为本地开发依赖使用。主要 API 可查阅 [pkg.generated.mbti](pkg.generated.mbti)：
 
 | API | 返回值 |

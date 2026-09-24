@@ -7,6 +7,7 @@ const help = `MoonCue — CUE sheet checker and audio split planner
 Usage:
   node cli/mooncue.mjs check <file.cue>
   node cli/mooncue.mjs normalize <file.cue>
+  node cli/mooncue.mjs catalog <file.cue>
   node cli/mooncue.mjs plan <file.cue> [--gap exclude|append|prepend] [--durations file.json]
 
 All file input must be UTF-8. Output goes to stdout; input is never overwritten.
@@ -20,7 +21,7 @@ if (!args.length || args[0] === '--help') {
 } else {
   try {
     const [command, input, ...options] = args;
-    if (!['check', 'normalize', 'plan'].includes(command) || !input || input.startsWith('--')) {
+    if (!['check', 'normalize', 'plan', 'catalog'].includes(command) || !input || input.startsWith('--')) {
       throw new Error('Expected a command and input file. Run with --help.');
     }
     let gap = 'exclude';

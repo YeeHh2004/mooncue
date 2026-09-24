@@ -6,6 +6,8 @@ import {
 }
 
 // Values
+pub fn catalog(String) -> Result[Array[TrackEntry], Array[Diagnostic]]
+
 pub fn format_time(Int) -> Result[String, String]
 
 pub fn normalize(String) -> Result[String, Array[Diagnostic]]
@@ -78,6 +80,17 @@ pub struct Track {
   metadata : Map[String, String]
   remarks : Array[String]
   indexes : Array[CueIndex]
+} derive(ToJson)
+
+pub struct TrackEntry {
+  number : Int
+  file : String
+  file_type : String
+  title : String
+  performer : String
+  songwriter : String
+  start_frame : Int
+  line : Int
 } derive(ToJson)
 
 // Type aliases
