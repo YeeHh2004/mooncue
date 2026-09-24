@@ -11,4 +11,3 @@ pub fn process_request(String, String, String, String) -> String
 // Type aliases
 
 // Traits
-
