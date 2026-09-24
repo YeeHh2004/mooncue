@@ -97,6 +97,6 @@ CLI 输出到标准输出，不自动覆盖原文件。`check` 和 `plan` 输出
 
 ## 来源、许可证与 AI 使用
 
-Apache-2.0。独立实现；格式语义参考 [GNU ccd2cue 文档](https://www.gnu.org/software/ccd2cue/manual/html_node/CUE-sheet-format.html)及 [GNU libcdio](https://www.gnu.org/software/libcdio/)，未复制它们的源码或整段文档。测试输入是自行编写的合成样例，不含第三方音频。
+Apache-2.0。独立实现；格式语义参考 [GNU ccd2cue 文档](https://www.gnu.org/software/ccd2cue/manual/html_node/CUE-sheet-format.html)及 [GNU libcdio](https://www.gnu.org/software/libcdio/)，未复制它们的源码或整段文档。除自行编写的合成样例外，测试另引用 MaxMEllon/cue-parser 的两份 MIT 许可 CUE 文本，来源和原始许可证见 [测试数据说明](tests/fixtures/cue-parser/README.md)。未移植其解析器代码，不含第三方音频。
 
 项目使用 AI 辅助设计、编码、测试和文档。参赛者仍需理解数据模型、间隙处理、测试结果和支持边界；不能将测试通过等同于主办方已验收或奖金已获批。
