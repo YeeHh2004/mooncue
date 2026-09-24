@@ -4,19 +4,32 @@ permissions:
   contents: read
 jobs:
   test:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.os }} / Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            node: '20'
+          - os: ubuntu-latest
+            node: '22'
+          - os: windows-latest
+            node: '22'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-      - name: Install MoonBit from official distribution
-        run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh -o /tmp/install-moonbit.sh
-          bash /tmp/install-moonbit.sh
-          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+          node-version: ${{ matrix.node }}
+      - name: Install MoonBit across platforms
+        uses: hustcer/setup-moonbit@9199da0ab63ea0c0bab1dc15f03d76e17ed4f75f # v1.22
       - run: moon version --all
+      - run: moon fmt --check
       - run: moon check --target js
+      - run: moon info
+      - name: Verify published interfaces match source
+        run: git diff --exit-code -- '*.mbti'
       - run: moon test --target js
       - run: moon test --target wasm-gc
       - run: moon build --target js --release
