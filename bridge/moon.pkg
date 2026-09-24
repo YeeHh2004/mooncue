@@ -1,0 +1,9 @@
+import {
+  "YeeHh2004/mooncue" @cue,
+}
+
+pkgtype(kind: "executable")
+
+options(
+  link: { "js": { "exports": [ "process_request" ], "format": "esm" } },
+)

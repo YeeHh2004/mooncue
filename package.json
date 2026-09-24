@@ -1,0 +1,13 @@
+{
+  "name": "mooncue",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "I/O adapter for the MoonBit MoonCue library",
+  "license": "Apache-2.0",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "moon build --target js --release",
+    "test": "moon test --target js && moon test --target wasm-gc && npm run build && node --test tests/cli.test.mjs"
+  }
+}

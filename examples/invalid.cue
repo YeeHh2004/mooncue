@@ -1,0 +1,8 @@
+TITLE "Broken example"
+FILE "album.wav" WAVE
+  TRACK 01 AUDIO
+    INDEX 01 00:00:75
+  TRACK 02 AUDIO
+    INDEX 01 04:00:00
+    INDEX 02 03:00:00
+UNKNOWN value

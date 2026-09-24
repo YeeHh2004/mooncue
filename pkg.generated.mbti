@@ -1,0 +1,85 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "YeeHh2004/mooncue"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn format_time(Int) -> Result[String, String]
+
+pub fn normalize(String) -> Result[String, Array[Diagnostic]]
+
+pub fn parse(String) -> Report
+
+pub fn parse_time(String) -> Result[Int, String]
+
+pub fn plan(String, GapPolicy, Map[String, Int]) -> Result[Array[Segment], Array[Diagnostic]]
+
+pub fn process_request(String, String, String, String) -> String
+
+// Errors
+
+// Types and methods
+pub struct CueFile {
+  name : String
+  kind : String
+  line : Int
+  tracks : Array[Track]
+} derive(ToJson)
+
+pub struct CueIndex {
+  number : Int
+  frames : Int
+  line : Int
+} derive(Eq, ToJson)
+
+pub struct Diagnostic {
+  severity : String
+  code : String
+  line : Int
+  message : String
+} derive(Eq, ToJson, @debug.Debug)
+
+pub(all) enum GapPolicy {
+  Exclude
+  AppendPrevious
+  PrependNext
+} derive(Eq)
+
+pub struct Report {
+  sheet : Sheet
+  diagnostics : Array[Diagnostic]
+} derive(ToJson)
+pub fn Report::is_valid(Self) -> Bool
+
+pub struct Segment {
+  file : String
+  track : Int
+  title : String
+  start_frame : Int
+  end_frame : Int?
+  generated_pregap_frames : Int
+  generated_postgap_frames : Int
+} derive(Eq)
+pub impl ToJson for Segment
+
+pub struct Sheet {
+  metadata : Map[String, String]
+  remarks : Array[String]
+  files : Array[CueFile]
+} derive(ToJson)
+
+pub struct Track {
+  number : Int
+  mode : String
+  line : Int
+  metadata : Map[String, String]
+  remarks : Array[String]
+  indexes : Array[CueIndex]
+} derive(ToJson)
+
+// Type aliases
+
+// Traits
+
