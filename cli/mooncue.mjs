@@ -3,6 +3,13 @@
 import { readFile } from 'node:fs/promises';
 import { process_request } from '../_build/js/release/build/bridge/bridge.js';
 
+async function readCue(input) {
+  if (input !== '-') return readFile(input);
+  const chunks = [];
+  for await (const chunk of process.stdin) chunks.push(chunk);
+  return Buffer.concat(chunks);
+}
+
 const help = `MoonCue — CUE sheet checker and audio split planner
 Usage:
   node cli/mooncue.mjs check <file.cue>
@@ -12,6 +19,7 @@ Usage:
   node cli/mooncue.mjs audit <file.cue> [--gap exclude|append|prepend] [--durations file.json]
 
 All file input must be UTF-8. Output goes to stdout; input is never overwritten.
+Use - as the CUE filename to read UTF-8 bytes from stdin (durations still use a file).
 Durations: JSON object mapping exact FILE names to integer lengths in CD frames (1/75 s).
 Unknown final lengths remain null. No audio is read, decoded, split or modified.
 Exit codes: 0 success; 1 validation error; 2 invocation or I/O error.
@@ -38,7 +46,7 @@ if (!args.length || args[0] === '--help') {
       if (key === '--gap') gap = value;
       else durations = new TextDecoder('utf-8', { fatal: true }).decode(await readFile(value));
     }
-    const text = new TextDecoder('utf-8', { fatal: true }).decode(await readFile(input));
+    const text = new TextDecoder('utf-8', { fatal: true }).decode(await readCue(input));
     const result = JSON.parse(process_request(command, text, gap, durations));
     if (command === 'normalize' && result.ok) {
       process.stdout.write(result.output);

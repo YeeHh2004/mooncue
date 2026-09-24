@@ -113,3 +113,18 @@ test('all valid operations preserve source bytes', () => {
   for (const command of ['check','normalize','plan']) assert.equal(cli(command,input).status,0);
   assert.deepEqual(readFileSync(input),before);
 });
+test('stdin accepts exact UTF-8 content for every single-document command', () => {
+  for (const command of ['check','normalize','plan','catalog','audit']) {
+    const r = spawnSync(process.execPath,['cli/mooncue.mjs',command,'-'],{cwd:root,input:Buffer.from(album),encoding:'utf8'});
+    assert.equal(r.status,0,r.stderr);
+    if (command === 'normalize') assert.match(r.stdout,/月下录音/);
+    else assert.equal(JSON.parse(r.stdout).ok,true);
+  }
+});
+test('stdin rejects malformed UTF-8 and reports empty input as invalid CUE', () => {
+  const invalid = spawnSync(process.execPath,['cli/mooncue.mjs','check','-'],{cwd:root,input:Buffer.from([0xc3,0x28]),encoding:'utf8'});
+  assert.equal(invalid.status,2);
+  const empty = spawnSync(process.execPath,['cli/mooncue.mjs','check','-'],{cwd:root,input:'',encoding:'utf8'});
+  assert.equal(empty.status,1);
+  assert.equal(JSON.parse(empty.stdout).ok,false);
+});

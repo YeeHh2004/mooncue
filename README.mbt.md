@@ -27,6 +27,8 @@ node cli/mooncue.mjs plan examples/album.cue --gap exclude --durations examples/
 
 仅看 MoonBit 内置演示：`moon run cmd/main --target js`。
 
+上述单文档命令均可把文件名替换为 `-`，从标准输入读取 UTF-8 CUE。例：Unix shell 下 `cat examples/album.cue | node cli/mooncue.mjs check -`。程序会等待输入结束后解析，仍检查非法 UTF-8；Windows 管道须确保上游输出 UTF-8，直接传文件路径可避免 shell 编码差异。
+
 CLI 输出到标准输出，不自动覆盖原文件。`check` 和 `plan` 输出 JSON；`normalize` 成功时输出 CUE 文本，错误时输出 JSON。退出码：0 成功、1 输入校验或规划失败、2 参数或文件读取失败。
 
 ## 已实现
