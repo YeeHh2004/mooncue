@@ -98,7 +98,7 @@ fn error(
   line : Int,
   message : String,
 ) -> Unit {
-  ds.push({ severity: "error", code, line, message })
+  ds.push({ severity: "error", code, line, message, })
 }
 
 ///|
@@ -108,7 +108,7 @@ fn warning(
   line : Int,
   message : String,
 ) -> Unit {
-  ds.push({ severity: "warning", code, line, message })
+  ds.push({ severity: "warning", code, line, message, })
 }
 
 ///|

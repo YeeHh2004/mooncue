@@ -68,7 +68,7 @@ pub fn audit_plan(
       let segment = segments[segment_index]
       segment_index += 1
       if segment.start_frame > cursor {
-        omitted.push({ start_frame: cursor, end_frame: segment.start_frame })
+        omitted.push({ start_frame: cursor, end_frame: segment.start_frame, })
         omitted_count += segment.start_frame - cursor
       }
       match segment.end_frame {
@@ -95,5 +95,5 @@ pub fn audit_plan(
       omitted,
     })
   }
-  Ok({ complete, segments, sources })
+  Ok({ complete, segments, sources, })
 }

@@ -55,7 +55,7 @@ fn put_metadata(
 ///|
 /// Parse the documented audio CUE profile; unsupported commands are errors.
 pub fn parse(text : String) -> Report {
-  let sheet : Sheet = { metadata: Map([]), remarks: [], files: [] }
+  let sheet : Sheet = { metadata: Map([]), remarks: [], files: [], }
   let ds : Array[Diagnostic] = []
   let mut file : CueFile? = None
   let mut track : Track? = None
@@ -210,7 +210,7 @@ pub fn parse(text : String) -> Report {
             continue
           }
         }
-        t.indexes.push({ number: n, frames, line: line_no })
+        t.indexes.push({ number: n, frames, line: line_no, })
       }
       "TITLE" | "PERFORMER" | "SONGWRITER" => {
         let meta = match track {
@@ -292,7 +292,7 @@ pub fn parse(text : String) -> Report {
     }
   }
   validate_sheet(sheet, ds)
-  { sheet, diagnostics: ds }
+  { sheet, diagnostics: ds, }
 }
 
 ///|

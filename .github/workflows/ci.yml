@@ -24,6 +24,9 @@ jobs:
           node-version: ${{ matrix.node }}
       - name: Install MoonBit across platforms
         uses: hustcer/setup-moonbit@9199da0ab63ea0c0bab1dc15f03d76e17ed4f75f # v1.22
+        with:
+          version: '0.10.14+7d59c7ec9'
+          core-version: '0.10.14+7d59c7ec9'
       - run: moon version --all
       - run: moon fmt --check
       - run: moon check --target js
