@@ -36,10 +36,16 @@ node cli/mooncue.mjs plan examples/album.cue --gap prepend --durations examples/
 ```sh
 moon test --target js
 moon test --target wasm-gc
-node --test tests/cli.test.mjs
+node --test tests/cli.test.mjs tests/conformance.test.mjs
 ```
 
-展示 35 个核心测试在两个目标运行，以及 16 个接口/CLI 测试。说明暂不做音频切割、刻录或 GUI，输入不被覆盖。
+展示 47 个核心测试在两个目标运行，以及 31 个接口/CLI 测试。说明暂不做音频切割、刻录或 GUI，输入不被覆盖。
+
+## 可追加演示
+
+- `node cli/mooncue.mjs catalog examples/album.cue`：查看继承专辑表演者的曲目列表。
+- `node cli/mooncue.mjs audit examples/album.cue --durations examples/durations.json`：默认排除 150 帧，选中 29850 帧，总计 30000 帧。
+- `node cli/mooncue.mjs batch-check examples/invalid.cue examples/album.cue`：损坏文件不阻止后续检查，汇总 1 个有效、1 个无效，退出码 1。
 
 ## 需要能解释的五个问题
 

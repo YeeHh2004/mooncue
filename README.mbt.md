@@ -10,7 +10,7 @@ Core parsing, validation, normalization and split planning are written in MoonBi
 
 ## 快速运行
 
-环境：MoonBit 工具链、Node.js 20+。本地已验证 `moonc v0.10.4+2cc641edf`；CI 验证官方当前工具链。不要把 `.cue` 文件按 GBK 直接输入；先转换为 UTF-8。
+环境：MoonBit 0.10.14 工具链、Node.js 20+。可复现工具链版本为 `moonc v0.10.14+7d59c7ec9`；CI 固定编译器与核心库版本。早期功能测试也通过了 0.10.4，此版本使用显式方法扩展，运行与贡献代码时应使用下述固定版本。不要把 `.cue` 文件按 GBK 直接输入；先转换为 UTF-8。
 
 ```sh
 git clone https://github.com/YeeHh2004/mooncue.git
@@ -18,7 +18,7 @@ cd mooncue
 moon test --target js
 moon test --target wasm-gc
 moon build --target js --release
-node --test tests/cli.test.mjs
+node --test tests/cli.test.mjs tests/conformance.test.mjs
 
 node cli/mooncue.mjs check examples/album.cue
 node cli/mooncue.mjs normalize examples/album.cue
@@ -43,7 +43,7 @@ CLI 输出到标准输出，不自动覆盖原文件。`check` 和 `plan` 输出
 - 规范化合法输入；遇到错误拒绝输出“修复后的”文件，避免悄悄丢弃不认识的信息。
 - 以整数 CD 帧为单位规划音频片段，单帧为 1/75 秒；未知源长度不会猜测。
 - 显式区分文件内 INDEX 00 音频与 PREGAP/POSTGAP 生成静音。
-- 35 个 MoonBit 测试（JS 与 Wasm 各运行一遍）及 16 个 CLI/API 测试，另有时间换算往返采样及 600 个确定性畸形输入样本。
+- 47 个 MoonBit 测试（JS 与 Wasm 各运行一遍）、26 个 CLI/API 测试及 5 个兼容性/属性测试；包含 600 个确定性畸形输入、120 组多文件样例的语义往返和三种策略的逐帧覆盖核对。
 
 ## 三种间隙策略
 
@@ -77,6 +77,8 @@ CLI 输出到标准输出，不自动覆盖原文件。`check` 和 `plan` 输出
 | `format_time(18000)` | `Ok("04:00:00")` |
 | `normalize(text)` | `Result[String, Array[Diagnostic]]` |
 | `plan(text, policy, durations)` | `Result[Array[Segment], Array[Diagnostic]]` |
+| `catalog(text)` | `Result[Array[TrackEntry], Array[Diagnostic]]` |
+| `audit_plan(text, policy, durations)` | `Result[PlanAudit, Array[Diagnostic]]` |
 | `process_request(command, text, policy, durations_json)` | 稳定 JSON 信封，供 JS 或 CLI 使用 |
 
 数据模型：Sheet → CueFile → Track → CueIndex。解析结果保留原始行号；规范化会重新排版，所以不保证字节或行号保持不变。REM 内容保留，可能移动到所属作用域的规范位置。
@@ -96,6 +98,7 @@ CLI 输出到标准输出，不自动覆盖原文件。`check` 和 `plan` 输出
 - [查重记录](docs/ECOSYSTEM-SEARCH.zh-CN.md)
 - [验收演示与理解要点](docs/DEMO.zh-CN.md)
 - [测试记录](docs/VALIDATION.md)
+- [实质提交说明](docs/COMMIT-AUDIT.md)
 
 ## 来源、许可证与 AI 使用
 

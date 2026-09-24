@@ -196,7 +196,8 @@ pub fn plan(
 
 ///|
 /// Stable JSON response envelope shared by the CLI and other JS consumers.
-/// Commands: check, normalize, plan. Invalid input never returns a partial plan.
+/// Commands: check, normalize, plan, catalog, audit. Invalid transformations
+/// never return partial output; check intentionally includes recovered structure.
 pub fn process_request(
   command : String,
   text : String,
