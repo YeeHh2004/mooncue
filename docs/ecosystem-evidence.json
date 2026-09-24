@@ -1,0 +1,9 @@
+{
+  "checked_at": "2026-09-24",
+  "source": "https://mooncakes.io/api/v0/modules",
+  "module_count": 2637,
+  "snapshot_sha256": "8d6bc85cd9d699b8a32538ed448cc124e6ea223f154f49a8b1f8bdadb60c6c08",
+  "pattern": "cue.?sheet|\\bcue\\b|曲目表",
+  "matches": [],
+  "limitations": "Metadata search only; not an audit of source code, unpublished projects or private registration lists."
+}
