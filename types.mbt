@@ -32,6 +32,7 @@ pub struct CueFile {
   kind : String
   line : Int
   tracks : Array[Track]
+  remarks : Array[String]
 } derive(ToJson)
 
 ///|

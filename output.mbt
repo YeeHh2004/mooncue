@@ -44,6 +44,9 @@ pub fn normalize(text : String) -> Result[String, Array[Diagnostic]] {
   }
   for file in sheet.files {
     lines.push("FILE " + quoted(file.name) + " " + file.kind)
+    for rem in file.remarks {
+      lines.push("  REM " + rem)
+    }
     for track in file.tracks {
       lines.push("  TRACK " + pad2(track.number) + " " + track.mode)
       emit_metadata(

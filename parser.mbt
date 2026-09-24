@@ -100,7 +100,11 @@ pub fn parse(text : String) -> Report {
       let value = line[3:].to_owned().trim().to_owned()
       match track {
         Some(t) => t.remarks.push(value)
-        None => sheet.remarks.push(value)
+        None =>
+          match file {
+            Some(f) => f.remarks.push(value)
+            None => sheet.remarks.push(value)
+          }
       }
       continue
     }
@@ -147,6 +151,7 @@ pub fn parse(text : String) -> Report {
           kind: parts[2].to_upper(),
           line: line_no,
           tracks: [],
+          remarks: [],
         }
         if !["WAVE", "MP3", "AIFF", "BINARY", "MOTOROLA"].contains(f.kind) {
           error(ds, "E_FILE_TYPE", line_no, "unsupported FILE type: " + f.kind)
