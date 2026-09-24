@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { readFileSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { readFileSync, mkdtempSync, writeFileSync, rmSync, mkdirSync, copyFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,7 +9,36 @@ import { process_request } from '../_build/js/release/build/bridge/bridge.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const album = readFileSync(new URL('../examples/album.cue', import.meta.url), 'utf8');
-const cli = (...args) => spawnSync(process.execPath, ['cli/mooncue.mjs', ...args], { cwd: root, encoding: 'utf8' });
+const cli = (...args) => spawnSync(process.execPath, ['cli/mooncue.mjs', ...args], { cwd: root, encoding: 'utf8', timeout: 10000 });
+
+test('unbuilt checkout can show help and gives actionable build instructions', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'mooncue 未构建 '));
+  try {
+    mkdirSync(join(dir, 'cli'));
+    const entry = join(dir, 'cli/mooncue.mjs');
+    copyFileSync(join(root, 'cli/mooncue.mjs'), entry);
+    const help = spawnSync(process.execPath, [entry, '--help'], { cwd: dir, encoding: 'utf8', timeout: 10000 });
+    assert.equal(help.status, 0, help.stderr);
+    assert.match(help.stdout, /Usage:/);
+    for (const command of ['check', 'batch-check']) {
+      const run = spawnSync(process.execPath, [entry, 'check', 'album.cue'].map((v, i) => i === 1 ? command : v), { cwd: dir, encoding: 'utf8', timeout: 10000 });
+      assert.equal(run.status, 2);
+      assert.match(run.stderr, /moon build --target js --release/);
+      assert.doesNotMatch(run.stderr, /at ModuleLoader|node:internal/);
+      assert.equal(run.stdout, '');
+    }
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('CLI resolves compiled core independently of caller directory and preserves Unicode paths', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'mooncue 路径 '));
+  try {
+    writeFileSync(join(dir, '专辑 空格.cue'), album, 'utf8');
+    const run = spawnSync(process.execPath, [join(root, 'cli/mooncue.mjs'), 'check', '专辑 空格.cue'], { cwd: dir, encoding: 'utf8', timeout: 10000 });
+    assert.equal(run.status, 0, run.stderr);
+    assert.equal(JSON.parse(run.stdout).output.metadata.TITLE, '月下录音');
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
 
 test('CLI help succeeds', () => {
   const r = cli('--help');

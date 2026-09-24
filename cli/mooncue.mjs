@@ -1,7 +1,18 @@
 #!/usr/bin/env node
 // I/O adapter only: all parsing, validation, normalization and planning are MoonBit.
 import { readFile } from 'node:fs/promises';
-import { process_request } from '../_build/js/release/build/bridge/bridge.js';
+let process_request;
+
+async function loadCore() {
+  try {
+    ({ process_request } = await import('../_build/js/release/build/bridge/bridge.js'));
+  } catch (error) {
+    if (error.code === 'ERR_MODULE_NOT_FOUND') {
+      throw new Error('Compiled MoonBit core is unavailable. From the project directory run: moon build --target js --release');
+    }
+    throw error;
+  }
+}
 
 async function readCue(input) {
   if (input !== '-') return readFile(input);
@@ -51,33 +62,34 @@ if (!args.length || args[0] === '--help') {
   console.log(help);
 } else {
   try {
+    await loadCore();
     if (args[0] === 'batch-check') {
       await batchCheck(args.slice(1));
     } else {
-    const [command, input, ...options] = args;
-    if (!['check', 'normalize', 'plan', 'catalog', 'audit'].includes(command) || !input || input.startsWith('--')) {
-      throw new Error('Expected a command and input file. Run with --help.');
-    }
-    let gap = 'exclude';
-    let durations = '{}';
-    const seen = new Set();
-    for (let i = 0; i < options.length; i += 2) {
-      const key = options[i];
-      const value = options[i + 1];
-      if (!['plan','audit'].includes(command) || !['--gap', '--durations'].includes(key) || !value || seen.has(key)) {
-        throw new Error(`Invalid or duplicate option: ${key}`);
+      const [command, input, ...options] = args;
+      if (!['check', 'normalize', 'plan', 'catalog', 'audit'].includes(command) || !input || input.startsWith('--')) {
+        throw new Error('Expected a command and input file. Run with --help.');
       }
-      seen.add(key);
-      if (key === '--gap') gap = value;
-      else durations = new TextDecoder('utf-8', { fatal: true }).decode(await readFile(value));
-    }
-    const text = new TextDecoder('utf-8', { fatal: true }).decode(await readCue(input));
-    const result = JSON.parse(process_request(command, text, gap, durations));
-    if (command === 'normalize' && result.ok) {
-      process.stdout.write(result.output);
-      if (result.diagnostics.length) console.error(JSON.stringify(result.diagnostics, null, 2));
-    } else console.log(JSON.stringify(result, null, 2));
-    if (!result.ok) process.exitCode = 1;
+      let gap = 'exclude';
+      let durations = '{}';
+      const seen = new Set();
+      for (let i = 0; i < options.length; i += 2) {
+        const key = options[i];
+        const value = options[i + 1];
+        if (!['plan','audit'].includes(command) || !['--gap', '--durations'].includes(key) || !value || seen.has(key)) {
+          throw new Error(`Invalid or duplicate option: ${key}`);
+        }
+        seen.add(key);
+        if (key === '--gap') gap = value;
+        else durations = new TextDecoder('utf-8', { fatal: true }).decode(await readFile(value));
+      }
+      const text = new TextDecoder('utf-8', { fatal: true }).decode(await readCue(input));
+      const result = JSON.parse(process_request(command, text, gap, durations));
+      if (command === 'normalize' && result.ok) {
+        process.stdout.write(result.output);
+        if (result.diagnostics.length) console.error(JSON.stringify(result.diagnostics, null, 2));
+      } else console.log(JSON.stringify(result, null, 2));
+      if (!result.ok) process.exitCode = 1;
     }
   } catch (error) {
     console.error(`mooncue: ${error.message}`);
