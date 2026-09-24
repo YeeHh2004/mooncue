@@ -128,3 +128,29 @@ test('stdin rejects malformed UTF-8 and reports empty input as invalid CUE', () 
   assert.equal(empty.status,1);
   assert.equal(JSON.parse(empty.stdout).ok,false);
 });
+test('batch-check handles all-valid files in input order', () => {
+  const r = cli('batch-check','examples/album.cue','examples/multifile.cue');
+  assert.equal(r.status,0,r.stderr);
+  const data = JSON.parse(r.stdout);
+  assert.deepEqual(data.summary,{files:2,valid:2,invalid:0,unreadable:0});
+  assert.deepEqual(data.results.map(r => r.input),['examples/album.cue','examples/multifile.cue']);
+});
+test('batch-check continues after content errors and returns aggregate failure', () => {
+  const r = cli('batch-check','examples/invalid.cue','examples/album.cue');
+  assert.equal(r.status,1);
+  const data = JSON.parse(r.stdout);
+  assert.equal(data.ok,false);
+  assert.deepEqual(data.summary,{files:2,valid:1,invalid:1,unreadable:0});
+  assert.equal(data.results[1].ok,true);
+});
+test('batch-check continues after I/O errors with exit code 2 taking precedence', () => {
+  const r = cli('batch-check','missing.cue','examples/invalid.cue','examples/album.cue');
+  assert.equal(r.status,2);
+  const data = JSON.parse(r.stdout);
+  assert.deepEqual(data.summary,{files:3,valid:1,invalid:1,unreadable:1});
+  assert.equal(typeof data.results[0].io_error,'string');
+  assert.equal(data.results[2].ok,true);
+});
+test('batch-check rejects ambiguous stdin and empty invocation', () => {
+  for (const args of [[],['-'],['--gap','exclude']]) assert.equal(cli('batch-check',...args).status,2);
+});

@@ -33,6 +33,8 @@ CLI 输出到标准输出，不自动覆盖原文件。`check` 和 `plan` 输出
 
 ## 已实现
 
+归档批量检查可运行 `node cli/mooncue.mjs batch-check examples/album.cue examples/invalid.cue`。输出逐文件 JSON 报告和汇总，遇到一个损坏或读不到的文件也会继续检查剩余文件。存在 I/O 错误时退出码 2 优先，否则内容错误为 1、全通过为 0。只检查显式传入的路径，不递归扫描目录；批处理不接受 stdin。
+
 - 解析 FILE、TRACK、INDEX、TITLE、PERFORMER、SONGWRITER、CATALOG、CDTEXTFILE、ISRC、FLAGS、PREGAP、POSTGAP、REM。
 - 支持 UTF-8 中文、带空格及 Windows 反斜杠路径、BOM、CRLF、制表符、多源文件、命令大小写不敏感。
 - 行号诊断：引号、参数、作用域、重复字段、时间范围、曲目/索引顺序、缺少 INDEX 01、未知命令和不支持的模式。

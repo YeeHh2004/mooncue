@@ -10,8 +10,30 @@ async function readCue(input) {
   return Buffer.concat(chunks);
 }
 
+async function batchCheck(inputs) {
+  if (!inputs.length || inputs.some(p => p === '-' || p.startsWith('--'))) {
+    throw new Error('batch-check requires one or more CUE paths; stdin and options are not supported.');
+  }
+  const results = [];
+  const summary = { files: inputs.length, valid: 0, invalid: 0, unreadable: 0 };
+  for (const input of inputs) {
+    try {
+      const text = new TextDecoder('utf-8', { fatal: true }).decode(await readFile(input));
+      const report = JSON.parse(process_request('check', text, '', '{}'));
+      summary[report.ok ? 'valid' : 'invalid']++;
+      results.push({ input, ...report });
+    } catch (error) {
+      summary.unreadable++;
+      results.push({ input, ok: false, io_error: error.message });
+    }
+  }
+  console.log(JSON.stringify({ ok: !summary.invalid && !summary.unreadable, summary, results }, null, 2));
+  process.exitCode = summary.unreadable ? 2 : summary.invalid ? 1 : 0;
+}
+
 const help = `MoonCue — CUE sheet checker and audio split planner
 Usage:
+  node cli/mooncue.mjs batch-check <first.cue> <second.cue> [...]
   node cli/mooncue.mjs check <file.cue>
   node cli/mooncue.mjs normalize <file.cue>
   node cli/mooncue.mjs catalog <file.cue>
@@ -29,6 +51,9 @@ if (!args.length || args[0] === '--help') {
   console.log(help);
 } else {
   try {
+    if (args[0] === 'batch-check') {
+      await batchCheck(args.slice(1));
+    } else {
     const [command, input, ...options] = args;
     if (!['check', 'normalize', 'plan', 'catalog', 'audit'].includes(command) || !input || input.startsWith('--')) {
       throw new Error('Expected a command and input file. Run with --help.');
@@ -53,6 +78,7 @@ if (!args.length || args[0] === '--help') {
       if (result.diagnostics.length) console.error(JSON.stringify(result.diagnostics, null, 2));
     } else console.log(JSON.stringify(result, null, 2));
     if (!result.ok) process.exitCode = 1;
+    }
   } catch (error) {
     console.error(`mooncue: ${error.message}`);
     process.exitCode = 2;
