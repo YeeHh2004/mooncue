@@ -72,6 +72,19 @@ pub fn parse(text : String) -> Report {
     if line.is_empty() {
       continue
     }
+    // Recover scope before tokenization: malformed quoted FILE/TRACK lines
+    // must not let subsequent indexes leak into the previous valid track.
+    let head = line
+      .iter()
+      .take_while(fn(c) { !c.is_ascii_whitespace() })
+      .collect()
+    let command_head = String::from_array(head).to_upper()
+    if command_head == "FILE" {
+      file = None
+      track = None
+    } else if command_head == "TRACK" {
+      track = None
+    }
     if line.any(fn(c) { c.is_control() && c != '\t' }) {
       error(ds, "E_CONTROL", line_no, "unexpected control character")
       continue
@@ -102,14 +115,6 @@ pub fn parse(text : String) -> Report {
       continue
     }
     let command = parts[0].to_upper()
-    // Invalid context boundaries must not attach later data to a previous track.
-    if command == "FILE" {
-      file = None
-      track = None
-    }
-    if command == "TRACK" {
-      track = None
-    }
     let expected = match command {
       "FILE" | "TRACK" | "INDEX" => 3
       "TITLE"
